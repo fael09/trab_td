@@ -1,9 +1,9 @@
+# -*- coding: utf-8 -*-
 import socket
 import threading
 import time
 
 all_connections = []
-
 
 def conectar():
     global msg_id
@@ -12,6 +12,7 @@ def conectar():
     while True:
         print'Broker on-line!'
         con, cliente = tcp.accept()
+        
          # lista de todas as conexoes
         #print 'depois de accept'
         ip,id_con = cliente
@@ -49,7 +50,9 @@ def conectar():
 def vericar_conec():
     time.sleep(1)
     while True:
-        print lista_de_clientes
+        # print lista_de_clientes
+
+        
         if (len(lista_de_clientes) >=1):
             #print lista_de_clientes
             
@@ -58,47 +61,69 @@ def vericar_conec():
                
                 try:
                     all_connections[i].send('PINGREG')
-                    echo = all_connections[i].recv(12)
+                    echo = all_connections[i].recv(1024)
+                    print echo
                     #
                 except:
                     
                     all_connections[i].close()
                     del all_connections[i]
-                    print "Topico Deletádo:", lista_de_clientes[i+1]
+                    # print "Topico Deletado:", lista_de_clientes[i+1]
                     del lista_de_clientes[i+1]
                     break
                     try:
                         pass
                     except:
                         pass
-                      
+               
+        time.sleep(5)
 
-                        
-        time.sleep(0.5)
 
-   
+def recebe_dados():
+
+    while True:
+        if len(all_connections) > 0:
+            msg_dados = all_connections[0].recv(1024)
+            if len(all_connections) > 1:
+                all_connections[1].send(msg_dados)
+            print msg_dados
+        time.sleep(1)
+
+
         
     
 ###########################################################
 # Inicio do Broker#########################################
 HOST = ''              # Endereco IP do Servidor
-PORT = 30002    # Porta que o Servidor esta
+PORT = 30003    # Porta que o Servidor esta
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 orig = (HOST, PORT)
 tcp.bind(orig)
 tcp.listen(10)
-
+lock = threading.Lock() 
 ##################  ###########
 lista_de_clientes = ["Boker"] # inicialmente vazia
 #############################
-#print 'Broker on-line!'
-
-
-thread_conec = threading.Thread(target=vericar_conec,args=())
+###########################################################
+thread_conec = threading.Thread(target=conectar,args=())
 thread_conec.daemon = True
 thread_conec.start()
 
-conectar()
+###########################################################
+###########################################################
+v_conec = threading.Thread(target=vericar_conec,args=())
+v_conec.daemon = True
+v_conec.start()
+########################################################
+recv_dados = threading.Thread(target=recebe_dados,args=())
+recv_dados.daemon = True
+recv_dados.start()
+###########################################################
+
+
+
+
+
 
 #conectar()
 while True:

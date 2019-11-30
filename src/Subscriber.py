@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import socket
 import time
 import threading
@@ -22,28 +23,44 @@ def conectar():
     return True
 
 def vericar_conec():
-    time.sleep(1)
+    
     while True:
-        ping = tcp.recv(7)
+        ping = tcp.recv(1024)
         print ping
         if ping == 'PINGREG':
             tcp.send('PINGRESP_SUB')
-        time.sleep(1)
+        time.sleep(5)
         #print 0
 ################Publisher############################
+def recebe_dados():
+    while True:
+        if tcp:
+            msg_dados = tcp.recv(1024)
+            print msg_dados
+        time.sleep(1)
+
+#####################################################
 
 HOST = '0.0.0.0'   # Endereco IP do Servidor
-PORT = 30002 # Porta que o Servidor esta
+PORT = 30003 # Porta que o Servidor esta
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 dest = (HOST, PORT)
 tcp.connect(dest)
 print 'Subscriber on-line'
-
-
-thread_conec = threading.Thread(target=vericar_conec,args=())
-thread_conec.daemon = True
-thread_conec.start()
-conectar()
+#########################################################
+conec = threading.Thread(target=conectar,args=())
+conec.daemon = True
+conec.start()
+#########################################################
+#########################################################
+v_conec = threading.Thread(target=vericar_conec,args=())
+v_conec.daemon = True
+v_conec.start()
+#########################################################
+recv_dados = threading.Thread(target=recebe_dados,args=())
+recv_dados.daemon = True
+recv_dados.start()
+##########################################################
 
 
 
