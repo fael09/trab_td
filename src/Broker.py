@@ -48,11 +48,9 @@ def conectar():
     
 
 def vericar_conec():
-    time.sleep(1)
+    
     while True:
         # print lista_de_clientes
-
-        
         if (len(lista_de_clientes) >=1):
             #print lista_de_clientes
             
@@ -62,7 +60,7 @@ def vericar_conec():
                 try:
                     all_connections[i].send('PINGREG')
                     echo = all_connections[i].recv(1024)
-                    print echo
+                    #print echo
                     #
                 except:
                     
@@ -76,7 +74,7 @@ def vericar_conec():
                     except:
                         pass
                
-        time.sleep(5)
+        time.sleep(0.01)
 
 
 def recebe_dados():
@@ -100,7 +98,8 @@ tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 orig = (HOST, PORT)
 tcp.bind(orig)
 tcp.listen(10)
-lock = threading.Lock() 
+lock = threading.Lock()
+msg_dados = ['Humidity: 46.00%  Temperature: 24.00°C 75.20°F']
 ##################  ###########
 lista_de_clientes = ["Boker"] # inicialmente vazia
 #############################
