@@ -6,7 +6,7 @@ import sys
 
 
 def conectar():
-    tcp.send('CONNECT-TEMP1')
+    tcp.send('CONNECT-PUB1')
     msg_total = tcp.recv(1024)
     if msg_total == 'CONNECT REFUSED':
         print msg_total
@@ -24,28 +24,33 @@ def conectar():
 
 def vericar_conec():
     time.sleep(1)
-    while True:
-        ping = tcp.recv(7)
-        # print ping
-        if ping == 'PINGREG':
-            tcp.send('PINGRESP_PUB')
-        time.sleep(5)
-        #print 0
+    while True:  
+        try:
+            tcp.send('')  
+        except:
+            print 'CONNECTION CLOSED'
+            tcp.close()
+            exit()
+        time.sleep(0.01)
+       
 ################Publisher############################
 
 def envia_dados():
     while True:
+        time.sleep(1)
         arquivo = open("htDHT11.txt","r")
-
         for linha in arquivo:
-            print 'Dados: ',linha # dados a serem enviados 
+            try:
+                
+                tcp.send(linha)
+            except:
+                pass
             time.sleep(1)
-            tcp.send(linha)
         ref_arquivo.close()
 
 
 HOST = '0.0.0.0'   # Endereco IP do Servidor
-PORT = 30003 # Porta que o Servidor esta
+PORT = 30001 # Porta que o Servidor esta
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 dest = (HOST, PORT)
 tcp.connect(dest)
@@ -67,5 +72,4 @@ env_dados.start()
 
 while True:
     time.sleep(1)
-    print('ok')
 tcp.close()

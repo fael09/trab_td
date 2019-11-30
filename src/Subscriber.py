@@ -6,7 +6,7 @@ import threading
 
 
 def conectar():
-    tcp.send('CONNECT-TEMP2')
+    tcp.send('CONNECT-SUB1')
     msg_total = tcp.recv(1024)
     if msg_total == 'CONNECT REFUSED':
         print msg_total
@@ -23,26 +23,36 @@ def conectar():
     return True
 
 def vericar_conec():
-    
+    time.sleep(1)
     while True:
-        ping = tcp.recv(1024)
-        print ping
-        if ping == 'PINGREG':
-            tcp.send('PINGRESP_SUB')
-        time.sleep(5)
-        #print 0
+        try :
+           tcp.send(' ')
+        except:
+            print 'CONNECTION CLOSED'
+            tcp.close()
+            exit()
+        time.sleep(0.01)
+       
 ################Publisher############################
 def recebe_dados():
+    tempo = 0
     while True:
-        if tcp:
+        try:
             msg_dados = tcp.recv(1024)
+        except:
+            exit()
+        if msg_dados[0] == ' ':
+            tempo = 0.005
+        else:
+            tempo = 0.5
             print msg_dados
-        time.sleep(1)
+
+        time.sleep(tempo)
 
 #####################################################
 
 HOST = '0.0.0.0'   # Endereco IP do Servidor
-PORT = 30003 # Porta que o Servidor esta
+PORT = 30001 # Porta que o Servidor esta
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 dest = (HOST, PORT)
 tcp.connect(dest)

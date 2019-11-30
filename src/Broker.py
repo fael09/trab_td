@@ -13,12 +13,10 @@ def conectar():
         print'Broker on-line!'
         con, cliente = tcp.accept()
         
-         # lista de todas as conexoes
-        #print 'depois de accept'
         ip,id_con = cliente
        
         msg_total = con.recv(1024)
-        
+        print msg_total
         
         msg_con, msg_id = msg_total.split('-')
 
@@ -43,48 +41,60 @@ def conectar():
                     print msg_sub 
                     con.send('SUBACK')
                 print lista_de_clientes        
-            
-        
-    
 
 def vericar_conec():
     
     while True:
-        # print lista_de_clientes
+        #print all_connections
         if (len(lista_de_clientes) >=1):
-            #print lista_de_clientes
             
             for i in range(0,len(all_connections)):
-                
-               
                 try:
-                    all_connections[i].send('PINGREG')
-                    echo = all_connections[i].recv(1024)
-                    #print echo
-                    #
+                    
+                    all_connections[i].send(' ')    
+                         
                 except:
                     
                     all_connections[i].close()
                     del all_connections[i]
-                    # print "Topico Deletado:", lista_de_clientes[i+1]
                     del lista_de_clientes[i+1]
                     break
                     try:
                         pass
                     except:
                         pass
-               
         time.sleep(0.01)
 
-
 def recebe_dados():
-
+    global msg_dados
     while True:
+        i  = 0
+        print lista_de_clientes 
         if len(all_connections) > 0:
-            msg_dados = all_connections[0].recv(1024)
-            if len(all_connections) > 1:
-                all_connections[1].send(msg_dados)
-            print msg_dados
+            while i < len(all_connections):
+                
+                if (i + 0) >= len(all_connections):
+                    break
+                if lista_de_clientes[i+1][0] == 'P': # he um publisher
+                    if (i + 0) >= len(all_connections):
+                        break
+                    msg_dados = all_connections[i].recv(1024)
+                    if (i + 0) >= len(all_connections):
+                        break
+                    #print 'recebendo ...'
+                if lista_de_clientes[i+1][0] == 'S': # he um subscriber 
+                    if (i + 0) >= len(all_connections):
+                        break
+                    for j in range(0,len(all_connections)):
+                        if lista_de_clientes[j+1][0] == 'P':
+                            all_connections[i].send(msg_dados)
+                            break
+                    if (i + 0) >= len(all_connections):
+                        break
+                    #print 'enviando ...'
+                
+                i = 1+i
+        
         time.sleep(1)
 
 
@@ -93,7 +103,7 @@ def recebe_dados():
 ###########################################################
 # Inicio do Broker#########################################
 HOST = ''              # Endereco IP do Servidor
-PORT = 30003    # Porta que o Servidor esta
+PORT = 30001    # Porta que o Servidor esta
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 orig = (HOST, PORT)
 tcp.bind(orig)
