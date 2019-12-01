@@ -41,7 +41,6 @@ def envia_dados():
         arquivo = open("htDHT11.txt","r")
         for linha in arquivo:
             try:
-                
                 tcp.send(linha)
             except:
                 pass
