@@ -46,7 +46,7 @@ def envia_dados():
             except:
                 pass
             time.sleep(1)
-        ref_arquivo.close()
+        arquivo.close()
 
 
 HOST = '0.0.0.0'   # Endereco IP do Servidor
