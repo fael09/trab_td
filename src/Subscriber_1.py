@@ -6,13 +6,13 @@ import threading
 
 # função que realixa a conexao ao broker
 def conectar():
-    tcp.send('CONNECT-SUB0')
+    tcp.send('CONNECT-SUB1')
     msg_total = tcp.recv(1024)
     if msg_total == 'CONNECT REFUSED':
         print msg_total
         exit()
     msg_con,msg_id = msg_total.split('-') 
-    print msg_con,'->',msg_id
+    #print msg_con,'->',msg_id
     if msg_con == 'CONNACK':
         #print msg_con
         tcp.send('SUBSCRIBE')
@@ -32,7 +32,6 @@ def vericar_conec():
             tcp.close()
             exit()
         time.sleep(0.01)
-       
 #função que recebe os dados do broker
 def recebe_dados():
     tempo = 0
@@ -71,9 +70,7 @@ recv_dados = threading.Thread(target=recebe_dados,args=())
 recv_dados.daemon = True
 recv_dados.start()
 ##########################################################
-
-
-#menu
+# menu
 while True:
      time.sleep(0.5)
 tcp.close()

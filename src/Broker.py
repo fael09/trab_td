@@ -2,9 +2,11 @@
 import socket
 import threading
 import time
+import os
+
 
 all_connections = []
-
+# função que realixa a conexao e desconexao de nos cliestes (publisher e subscriber)
 def conectar():
     global msg_id
     global con
@@ -16,7 +18,7 @@ def conectar():
         ip,id_con = cliente
        
         msg_total = con.recv(1024)
-        print msg_total
+        # print msg_total
         
         msg_con, msg_id = msg_total.split('-')
 
@@ -40,12 +42,13 @@ def conectar():
                 if msg_sub == 'SUBSCRIBE':
                     print msg_sub 
                     con.send('SUBACK')
-                print lista_de_clientes        
+                # print lista_de_clientes        
 
+# função de ferificacao das conexoes
 def vericar_conec():
     
     while True:
-        #print all_connections
+        
         if (len(lista_de_clientes) >=1):
             
             for i in range(0,len(all_connections)):
@@ -54,7 +57,7 @@ def vericar_conec():
                     all_connections[i].send(' ')    
                          
                 except:
-                    
+                    print 'DISCONNECT', lista_de_clientes[i+1]
                     all_connections[i].close()
                     del all_connections[i]
                     del lista_de_clientes[i+1]
@@ -64,12 +67,13 @@ def vericar_conec():
                     except:
                         pass
         time.sleep(0.01)
-
+# função que recebe os dados dos publisher
 def recebe_dados():
     global msg_dados
     while True:
         i  = 0
-        print lista_de_clientes 
+        # print lista_de_clientes
+         
         if len(all_connections) > 0:
             while i < len(all_connections):
                 
@@ -97,9 +101,6 @@ def recebe_dados():
         
         time.sleep(1)
 
-
-        
-    
 ###########################################################
 # Inicio do Broker#########################################
 HOST = ''              # Endereco IP do Servidor
@@ -114,27 +115,33 @@ msg_dados = ['Humidity: 46.00%  Temperature: 24.00°C 75.20°F']
 lista_de_clientes = ["Boker"] # inicialmente vazia
 #############################
 ###########################################################
+# Thread que gerencia as novas conexoes e aloca os topicos
 thread_conec = threading.Thread(target=conectar,args=())
 thread_conec.daemon = True
 thread_conec.start()
-
 ###########################################################
 ###########################################################
+#Thread que gerencia o estado das conexoes
 v_conec = threading.Thread(target=vericar_conec,args=())
 v_conec.daemon = True
 v_conec.start()
 ########################################################
+#Thread que recebe os dados 
 recv_dados = threading.Thread(target=recebe_dados,args=())
 recv_dados.daemon = True
 recv_dados.start()
 ###########################################################
-
-
-
-
-
-
-#conectar()
+#meno de visualizacao
 while True:
+    if len(all_connections) > 0:
+        print 'Dugite 1 para ver a lista de clientes'
+        print 'Digite 2 para ver as mensagens'
+        ent = input()
+        if ent == 1:
+            print 'Lista de clientes: ', lista_de_clientes
+        elif ent == 2:
+            print 'Dados: ', msg_dados
+        else:
+            print 'Entrada invalida'
     time.sleep(0.5)    
 con.close()

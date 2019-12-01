@@ -18,7 +18,7 @@ def conectar():
         tcp.send('SUBSCRIBE')
         msg_sub = tcp.recv(1024)
         if msg_sub == 'SUBACK':
-           print 'SUBACK'
+           print 'PUBACK'
            
     return True
 
@@ -69,7 +69,7 @@ env_dados = threading.Thread(target=envia_dados,args=())
 env_dados.daemon = True
 env_dados.start()
 
-
+#menu
 while True:
     time.sleep(1)
 tcp.close()
